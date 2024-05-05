@@ -27,7 +27,7 @@ def main_menu(last_score, time_taken):
     image_size = (70, 50)
     flappy = pygame.transform.scale(image, image_size)
     image_rect = flappy.get_rect()
-    image_rect.x = width//2-43
+    image_rect.x = (width/2)-43
     image_rect.y = 650
 
     while running:
@@ -114,7 +114,7 @@ def main_menu(last_score, time_taken):
             if actual_source_hover:
                 actual_source_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
-                    webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                    webbrowser.open("https://github.com/Flash09a14/FlappyBird")
             elif not trolled:
                 actual_source_color = (0, 0, 0)
             else:
