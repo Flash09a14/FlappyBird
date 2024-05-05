@@ -60,11 +60,6 @@ def main_menu(last_score, time_taken):
             source_rect.x = (width/2)-145
             source_rect.y = 400
 
-            actual_source_button = play_font.render("ACTUAL Source Code", True, actual_source_color)
-            actual_source_rect = actual_source_button.get_rect()
-            actual_source_rect.x = (width/2)-240
-            actual_source_rect.y = 475
-
             mouse = pygame.mouse.get_pos()
             mouse_rect = pygame.draw.rect(scrn, (255, 255, 255), pygame.Rect(mouse[0], mouse[1], 20, 20))
             hover = pygame.Rect.colliderect(mouse_rect, play_rect)
@@ -107,7 +102,7 @@ def main_menu(last_score, time_taken):
             else:
                 source_color = (255, 255, 255)
 
-            if rickroll_hover and event.type == MOUSEBUTTONUP:
+            if rickroll_hover and event.type == pygame.MOUSEBUTTONUP:
                 webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
                 
         scrn.fill((0, 0, 0))
@@ -117,7 +112,6 @@ def main_menu(last_score, time_taken):
         scrn.blit(last, last_rect)
         scrn.blit(quit_button, quit_rect)
         scrn.blit(source_button, source_rect)
-        scrn.blit(actual_source_button, actual_source_rect)
         scrn.blit(flappy, image_rect)
         pygame.display.flip()
         
