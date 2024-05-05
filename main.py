@@ -21,8 +21,6 @@ def main_menu(last_score, time_taken):
     color_two = (255, 255, 255)
     quit_color = (255, 255, 255)
     source_color = (255, 255, 255)
-    actual_source_color = (0, 0, 0)
-    trolled = False
     image = pygame.image.load("player.png")
     image_size = (70, 50)
     flappy = pygame.transform.scale(image, image_size)
@@ -73,7 +71,7 @@ def main_menu(last_score, time_taken):
             easter_egg = pygame.Rect.colliderect(mouse_rect, text_rect)
             quit_hover = pygame.Rect.colliderect(mouse_rect, quit_rect)
             source_hover = pygame.Rect.colliderect(mouse_rect, source_rect)
-            actual_source_hover = pygame.Rect.colliderect(mouse_rect, actual_source_rect)
+            rickroll_hover = pygame.Rect.colliderect(mouse_rect, image_rect)
             
             if hover:
                 color = (0, 255, 0)
@@ -105,21 +103,13 @@ def main_menu(last_score, time_taken):
             if source_hover:
                 source_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
-                    webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-                    actual_source_color = (255, 255, 255)
-                    trolled = True
+                    webbrowser.open("https://github.com/Flash09a14/FlappyBird")
             else:
                 source_color = (255, 255, 255)
 
-            if actual_source_hover:
-                actual_source_color = (0, 255, 0)
-                if event.type == pygame.MOUSEBUTTONUP:
-                    webbrowser.open("https://github.com/Flash09a14/FlappyBird")
-            elif not trolled:
-                actual_source_color = (0, 0, 0)
-            else:
-                actual_source_color = (255, 255, 255)
-
+            if rickroll_hover and event.type == MOUSEBUTTONUP:
+                webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                
         scrn.fill((0, 0, 0))
         scrn.blit(text, text_rect)
         scrn.blit(sub, sub_rect)
