@@ -5,6 +5,20 @@ import webbrowser
 
 pygame.init()
 
+class Button():
+    def __init__(self, font_size, color, x, y):
+        self.font_size = font_size
+        self.color = color
+        self.x = x
+        self.y = y
+        self.font = pygame.font.SysFont(None, font_size)
+    def make(self, text):
+        self.text = text
+        self.button = self.font.render(str(self.text), True, self.color)
+        self.button_rect = self.button.get_rect()
+        self.button_rect.x = self.x
+        self.button_rect.y = self.y
+
 def main_menu(last_score, time_taken):
     width = 1000
     height = 700
@@ -12,89 +26,96 @@ def main_menu(last_score, time_taken):
     scrn = pygame.display.set_mode((width, height))
     
     pygame.display.set_caption("Flappy Bird")
-    
+
+    # Run variable
     running = True
-    font = pygame.font.SysFont(None, 128)
-    play_font = pygame.font.SysFont(None, 64)
+
+    # Font variables    
     sub_font = pygame.font.SysFont(None, 32)
+
+    # Button color variables
     color = (255, 255, 255)
-    color_two = (255, 255, 255)
+    play_color = (255, 255, 255)
     quit_color = (255, 255, 255)
     source_color = (255, 255, 255)
+
+    # Image variables
     image = pygame.image.load("player.png")
     image_size = (70, 50)
     flappy = pygame.transform.scale(image, image_size)
     image_rect = flappy.get_rect()
-    image_rect.x = width//2-43
+    image_rect.x = (width/2)-43
     image_rect.y = 650
 
     while running:
         for event in pygame.event.get():
-            text = font.render("Flappy Bird", True, color_two)
-            text_rect = text.get_rect()
-            text_rect.x = (width/2)-250
-            text_rect.y = 60
+            logo = Button(128, color, (width/2)-250, 60)
+            logo.make("Flappy Bird")
 
+            # Render sub-text
             sub = sub_font.render("Made by Aram 9C (This took me way too long I wanna die)", True, (255, 255, 255))
             sub_rect = sub.get_rect()
             sub_rect.x = (width/2)-300
             sub_rect.y = 175
             
+            # Render stats text
             last = sub_font.render(f"Last Score: {last_score}, Time survived: {time_taken} (seconds)", True, (255, 0, 0))
             last_rect = last.get_rect()
             last_rect.x = (width/2)-300
             last_rect.y = 200
 
-            play = play_font.render("Play", True, color)
-            play_rect = play.get_rect()
-            play_rect.x = (width/2)-60
-            play_rect.y = 250
 
-            quit_button = play_font.render("Quit", True, quit_color)
-            quit_rect = quit_button.get_rect()
-            quit_rect.x = (width/2)-60
-            quit_rect.y = 325
+            # Render Play text
+            play = Button(64, play_color, (width/2)-60, 250)
+            play.make("Play")
 
-            source_button = play_font.render("Source Code", True, source_color)
-            source_rect = source_button.get_rect()
-            source_rect.x = (width/2)-145
-            source_rect.y = 400
+            # Render Quit text
+            quit_button = Button(64, quit_color, (width/2)-60, 325)
+            quit_button.make("Quit")
 
+            # Render Source Code text
+            source = Button(64, source_color, (width/2)-145, 400)
+            source.make("Source Code")
+
+            # Mouse variables
             mouse = pygame.mouse.get_pos()
             mouse_rect = pygame.draw.rect(scrn, (255, 255, 255), pygame.Rect(mouse[0], mouse[1], 20, 20))
-            hover = pygame.Rect.colliderect(mouse_rect, play_rect)
-            easter_egg = pygame.Rect.colliderect(mouse_rect, text_rect)
-            quit_hover = pygame.Rect.colliderect(mouse_rect, quit_rect)
-            source_hover = pygame.Rect.colliderect(mouse_rect, source_rect)
+
+            # Hover detection data
+            hover = pygame.Rect.colliderect(mouse_rect, play.button_rect)
+            easter_egg = pygame.Rect.colliderect(mouse_rect, logo.button_rect)
+            quit_hover = pygame.Rect.colliderect(mouse_rect, quit_button.button_rect)
+            source_hover = pygame.Rect.colliderect(mouse_rect, source.button_rect)
             rickroll_hover = pygame.Rect.colliderect(mouse_rect, image_rect)
+
             
+            # First hover event
             if hover:
-                color = (0, 255, 0)
+                play_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
                     return main()
                     running = False
             else:
-                color = (255, 255, 255)
-                    
+                play_color = (255, 255, 255)
 
+            # Second hover event
             if easter_egg:
-                color_two = (200, 200, 200)
+                color = (200, 200, 200)
                 if event.type == pygame.MOUSEBUTTONUP:
                     return main_inverted()
                     running = False
             else:
-                color_two = (255, 255, 255)
-            
-            if event.type == pygame.QUIT:
-                running = False
-                
+                color = (255, 255, 255)
+
+            # Third hover event
             if quit_hover:
                 quit_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
                     running = False
             else:
                 quit_color = (255, 255, 255)
-                
+
+            # Fourth hover event
             if source_hover:
                 source_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -102,16 +123,24 @@ def main_menu(last_score, time_taken):
             else:
                 source_color = (255, 255, 255)
 
+            # Fifth hover event
             if rickroll_hover and event.type == pygame.MOUSEBUTTONUP:
                 webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-                
+
+            # Quit
+            if event.type == pygame.QUIT:
+                running = False
+        
+        # Fill background
         scrn.fill((0, 0, 0))
-        scrn.blit(text, text_rect)
+
+        # Display buttons
+        scrn.blit(logo.button, logo.button_rect)
         scrn.blit(sub, sub_rect)
-        scrn.blit(play, play_rect)
+        scrn.blit(play.button, play.button_rect)
         scrn.blit(last, last_rect)
-        scrn.blit(quit_button, quit_rect)
-        scrn.blit(source_button, source_rect)
+        scrn.blit(quit_button.button, quit_button.button_rect)
+        scrn.blit(source.button, source.button_rect)
         scrn.blit(flappy, image_rect)
         pygame.display.flip()
         
