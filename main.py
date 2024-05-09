@@ -4,6 +4,7 @@ import random
 import webbrowser
 
 pygame.init()
+pygame.mixer.init()
 
 class Button():
     def __init__(self, font_size, color, x, y):
@@ -12,6 +13,7 @@ class Button():
         self.x = x
         self.y = y
         self.font = pygame.font.SysFont(None, font_size)
+        self.hovered = False
     def make(self, text):
         self.text = text
         self.button = self.font.render(str(self.text), True, self.color)
@@ -19,11 +21,32 @@ class Button():
         self.button_rect.x = self.x
         self.button_rect.y = self.y
 
-def main_menu(last_score, time_taken):
+class SFX():
+    def __init__(self, name):
+        self.name = str(name)
+        self.sound = pygame.mixer.Sound(self.name)
+        self.volume = 1.0
+
+    def sfx(self):
+        self.sound.set_volume(self.volume)
+        self.sound.play()
+
+    def set_volume(self, volume):
+        self.volume = volume
+
+    def unload_sfx(self):
+        self.sound.stop()
+        self.sound = None
+
+
+play_sfx = SFX("select.wav")
+
+def main_menu(last_score, time_taken, sfx_volume, audio_state):
+    pygame.mixer.music.set_volume(sfx_volume)
     width = 1000
-    height = 700
+    height = 800
     
-    scrn = pygame.display.set_mode((width, height))
+    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
     
     pygame.display.set_caption("Flappy Bird")
 
@@ -38,6 +61,7 @@ def main_menu(last_score, time_taken):
     play_color = (255, 255, 255)
     quit_color = (255, 255, 255)
     source_color = (255, 255, 255)
+    options_color = (255, 255, 255)
 
     # Image variables
     image = pygame.image.load("player.png")
@@ -46,6 +70,14 @@ def main_menu(last_score, time_taken):
     image_rect = flappy.get_rect()
     image_rect.x = (width/2)-43
     image_rect.y = 650
+
+    play_sound_played = False
+    quit_sound_played = False
+    source_sound_played = False
+    options_sound_played = False
+
+    # Set sound effect volume
+    play_sfx.set_volume(sfx_volume)
 
     while running:
         for event in pygame.event.get():
@@ -69,34 +101,40 @@ def main_menu(last_score, time_taken):
             play = Button(64, play_color, (width/2)-60, 250)
             play.make("Play")
 
+            options = Button(64, options_color, (width/2)-105, 325)
+            options.make("Options")
+
             # Render Quit text
-            quit_button = Button(64, quit_color, (width/2)-60, 325)
+            quit_button = Button(64, quit_color, (width/2)-60, 400)
             quit_button.make("Quit")
 
             # Render Source Code text
-            source = Button(64, source_color, (width/2)-145, 400)
+            source = Button(64, source_color, (width/2)-145, 475)
             source.make("Source Code")
 
             # Mouse variables
             mouse = pygame.mouse.get_pos()
-            mouse_rect = pygame.draw.rect(scrn, (255, 255, 255), pygame.Rect(mouse[0], mouse[1], 20, 20))
 
             # Hover detection data
-            hover = pygame.Rect.colliderect(mouse_rect, play.button_rect)
-            easter_egg = pygame.Rect.colliderect(mouse_rect, logo.button_rect)
-            quit_hover = pygame.Rect.colliderect(mouse_rect, quit_button.button_rect)
-            source_hover = pygame.Rect.colliderect(mouse_rect, source.button_rect)
-            rickroll_hover = pygame.Rect.colliderect(mouse_rect, image_rect)
+            hover = play.button_rect.collidepoint(mouse)
+            easter_egg = logo.button_rect.collidepoint(mouse)
+            quit_hover = quit_button.button_rect.collidepoint(mouse)
+            source_hover = source.button_rect.collidepoint(mouse)
+            options_hover = options.button_rect.collidepoint(mouse)
+            rickroll_hover = image_rect.collidepoint(mouse)
 
-            
             # First hover event
             if hover:
+                if not play_sound_played:
+                    play_sfx.sfx()
+                    play_sound_played = True
                 play_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
                     return main()
                     running = False
             else:
                 play_color = (255, 255, 255)
+                play_sound_played = False
 
             # Second hover event
             if easter_egg:
@@ -109,19 +147,38 @@ def main_menu(last_score, time_taken):
 
             # Third hover event
             if quit_hover:
+                if not quit_sound_played:
+                    play_sfx.sfx()
+                    quit_sound_played = True
                 quit_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
                     running = False
             else:
                 quit_color = (255, 255, 255)
+                quit_sound_played = False
 
             # Fourth hover event
             if source_hover:
+                if not source_sound_played:
+                    play_sfx.sfx()
+                    source_sound_played = True
                 source_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
                     webbrowser.open("https://github.com/Flash09a14/FlappyBird")
             else:
+                source_sound_played = False
                 source_color = (255, 255, 255)
+
+            if options_hover:
+                if not options_sound_played:
+                    play_sfx.sfx()
+                    options_sound_played = True
+                options_color = (0, 255, 0)
+                if event.type == pygame.MOUSEBUTTONUP:
+                    return options_menu(audio_state)
+            else:
+                options_sound_played = False
+                options_color = (255, 255, 255)
 
             # Fifth hover event
             if rickroll_hover and event.type == pygame.MOUSEBUTTONUP:
@@ -130,7 +187,7 @@ def main_menu(last_score, time_taken):
             # Quit
             if event.type == pygame.QUIT:
                 running = False
-        
+
         # Fill background
         scrn.fill((0, 0, 0))
 
@@ -141,15 +198,88 @@ def main_menu(last_score, time_taken):
         scrn.blit(last, last_rect)
         scrn.blit(quit_button.button, quit_button.button_rect)
         scrn.blit(source.button, source.button_rect)
+        scrn.blit(options.button, options.button_rect)
         scrn.blit(flappy, image_rect)
         pygame.display.flip()
+
+    play_sfx.unload_sfx()
+
+def options_menu(toggled):
+    width = 1000
+    height = 700
+
+    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
+
+    running = True
+
+    audio_color = (0, 255, 0) if toggled == True else (255, 0, 0)
+    back_color = (255, 255, 255)
+    audio_sound_played = False
+    back_sound_played = False
+    global_volume = 1.0
+    if toggled == False:
+        global_volume = 0.0
+    else:
+        global_volume = 1.0
+
+    while running:
+        for event in pygame.event.get():
+            font = pygame.font.SysFont(None, 72)
+            title = font.render("Options", True, (255, 255, 255))
+            title_rect = title.get_rect()
+            title_rect.x = (width/2)-100
+            title_rect.y = 60
+
+            audio = Button(50, audio_color, (width/2)-50, 150)
+            audio.make("Audio")
+
+            back = Button(32, back_color, (width/2)-32, 600)
+            back.make("Back")
+
+            mouse = pygame.mouse.get_pos()
+            audio_hover = audio.button_rect.collidepoint(mouse)
+            back_hover = back.button_rect.collidepoint(mouse)
+
+            if audio_hover:
+                if not audio_sound_played:
+                    play_sfx.sfx()
+                    audio_sound_played = True
+                if event.type == pygame.MOUSEBUTTONDOWN and toggled == False:
+                    audio_color = (0, 255, 0)
+                    global_volume = 1.0
+                    toggled = True
+                elif event.type == pygame.MOUSEBUTTONDOWN and toggled == True:
+                    audio_color = (255, 0, 0)
+                    global_volume = 0.0
+                    toggled = False
+            else:
+                audio_sound_played = False
+
+            if back_hover:
+                back_color = (0, 255, 0)
+                if not back_sound_played:
+                    play_sfx.sfx()
+                    back_sound_played = True
+                if event.type == pygame.MOUSEBUTTONUP:
+                    return main_menu(0, 0, global_volume, toggled)
+            else:
+                back_sound_played = False
+                back_color = (255, 255, 255)
+
+            scrn.blit(audio.button, audio.button_rect)
+            scrn.blit(title, title_rect)
+            scrn.blit(back.button, back.button_rect)
+            if event.type == pygame.QUIT:
+                running = False
+        pygame.display.flip()
+                
         
 
 def main():
     width = 1200
     height = 720
     
-    scrn = pygame.display.set_mode((width, height))
+    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
     
     pygame.display.set_caption("Flappy Bird")
     
@@ -245,6 +375,9 @@ def main():
         scrn.fill((0,0,0))
         scrn.blit(text, textRect)
         scrn.blit(player.flappy, player.rect)
+        if player.rect.y > height or player.rect.y < 0:
+            running = False
+            return main_menu(score, time.time()-start, 1, True)
     
         for enemy in enemies:
             enemy.move()
@@ -253,7 +386,7 @@ def main():
             enemy.velocity = enemy_velocity
             collide = pygame.Rect.colliderect(player.rect, enemy.rect_bottom) or pygame.Rect.colliderect(player.rect, enemy.rect_top)
             if collide:
-                return main_menu(score, time.time()-start)
+                return main_menu(score, time.time()-start, 1, True)
                 running = False
     
         spawn_timer += 1
@@ -272,7 +405,7 @@ def main_inverted():
     width = 1200
     height = 720
     
-    scrn = pygame.display.set_mode((width, height))
+    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
     
     pygame.display.set_caption("Flappy Bird")
     
@@ -375,6 +508,9 @@ def main_inverted():
         scrn.blit(text, textRect)
         scrn.blit(other_text, other_textRect)
         scrn.blit(player.invert, player.rect)
+        if player.rect.y > height or player.rect.y < 0:
+            running = False
+            return main_menu(score, time.time()-start, 1, True)
     
         for enemy in enemies:
             enemy.move()
@@ -383,7 +519,7 @@ def main_inverted():
             enemy.velocity = enemy_velocity
             collide = pygame.Rect.colliderect(player.rect, enemy.rect_bottom) or pygame.Rect.colliderect(player.rect, enemy.rect_top)
             if collide:
-                return main_menu(score, time.time()-start)
+                return main_menu(score, time.time()-start, 1, True)
                 running = False
     
         spawn_timer += 1
@@ -399,6 +535,6 @@ def main_inverted():
         clock.tick(60)
 
 if __name__ == "__main__":
-    main_menu(None, None)
+    main_menu(0, 0, 1, True)
 
 pygame.quit()
