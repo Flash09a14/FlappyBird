@@ -54,13 +54,10 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
     
     pygame.display.set_caption("Flappy Bird")
 
-    # Run variable
     running = True
-
-    # Font variables    
+   
     sub_font = pygame.font.SysFont(None, 32)
 
-    # Button color variables
     color = (255, 255, 255)
     play_color = (255, 255, 255)
     quit_color = (255, 255, 255)
