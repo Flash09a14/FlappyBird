@@ -206,7 +206,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
 
 def options_menu(toggled):
     width = 1000
-    height = 700
+    height = 500
 
     scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
 
@@ -230,10 +230,10 @@ def options_menu(toggled):
             title_rect.x = (width/2)-100
             title_rect.y = 60
 
-            audio = Button(50, audio_color, (width/2)-50, 150)
+            audio = Button(50, audio_color, (width/2)-50, (height/2)-50)
             audio.make("Audio")
 
-            back = Button(32, back_color, (width/2)-32, 600)
+            back = Button(32, back_color, (width/2)-32, height-100)
             back.make("Back")
 
             mouse = pygame.mouse.get_pos()
