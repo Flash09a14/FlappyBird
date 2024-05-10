@@ -76,7 +76,6 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
     source_sound_played = False
     options_sound_played = False
 
-    # Set sound effect volume
     play_sfx.set_volume(sfx_volume)
 
     while running:
@@ -90,32 +89,25 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             sub_rect.x = (width/2)-300
             sub_rect.y = 175
             
-            # Render stats text
             last = sub_font.render(f"Last Score: {last_score}, Time survived: {time_taken}s", True, (255, 0, 0))
             last_rect = last.get_rect()
             last_rect.x = (width/2)-300
             last_rect.y = 200
 
-
-            # Render Play text
             play = Button(64, play_color, (width/2)-60, 250)
             play.make("Play")
 
             options = Button(64, options_color, (width/2)-105, 325)
             options.make("Options")
 
-            # Render Quit text
             quit_button = Button(64, quit_color, (width/2)-60, 400)
             quit_button.make("Quit")
 
-            # Render Source Code text
             source = Button(64, source_color, (width/2)-145, 475)
             source.make("Source Code")
 
-            # Mouse variables
             mouse = pygame.mouse.get_pos()
 
-            # Hover detection data
             hover = play.button_rect.collidepoint(mouse)
             easter_egg = logo.button_rect.collidepoint(mouse)
             quit_hover = quit_button.button_rect.collidepoint(mouse)
@@ -123,7 +115,6 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             options_hover = options.button_rect.collidepoint(mouse)
             rickroll_hover = image_rect.collidepoint(mouse)
 
-            # First hover event
             if hover:
                 if not play_sound_played:
                     play_sfx.sfx()
@@ -136,7 +127,6 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
                 play_color = (255, 255, 255)
                 play_sound_played = False
 
-            # Second hover event
             if easter_egg:
                 color = (200, 200, 200)
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -145,7 +135,6 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             else:
                 color = (255, 255, 255)
 
-            # Third hover event
             if quit_hover:
                 if not quit_sound_played:
                     play_sfx.sfx()
@@ -157,7 +146,6 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
                 quit_color = (255, 255, 255)
                 quit_sound_played = False
 
-            # Fourth hover event
             if source_hover:
                 if not source_sound_played:
                     play_sfx.sfx()
@@ -180,18 +168,13 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
                 options_sound_played = False
                 options_color = (255, 255, 255)
 
-            # Fifth hover event
             if rickroll_hover and event.type == pygame.MOUSEBUTTONUP:
                 webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
-            # Quit
             if event.type == pygame.QUIT:
                 running = False
 
-        # Fill background
         scrn.fill((0, 0, 0))
-
-        # Display buttons
         scrn.blit(logo.button, logo.button_rect)
         scrn.blit(sub, sub_rect)
         scrn.blit(play.button, play.button_rect)
