@@ -290,6 +290,25 @@ def main(inverted):
     score = 0
     enemy_velocity = 5
     background_color = (0, 0, 0) if inverted == False else (255, 255, 255)
+
+    def handle_input():
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            player.jump()
+
+    def draw_text():
+        text_color = (255, 255, 255) if inverted == False else (0, 0, 0)
+        text = font.render(f'Score: {score}', True, text_color, None)
+        textRect = text.get_rect()
+        textRect.x = 20
+        textRect.y = 20
+        other_text = font.render("You found an easter egg! Inverted mode", True, (0, 0, 0), None)
+        other_textRect = other_text.get_rect()
+        other_textRect.x = 20
+        other_textRect.y = 50
+        scrn.blit(text, textRect)
+        if inverted == True:
+            scrn.blit(other_text, other_textRect)
     
     class Player(pygame.sprite.Sprite):
         def __init__(self):
@@ -362,24 +381,11 @@ def main(inverted):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-    
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            player.jump()
-    
-        text = font.render(f'Score: {score}', True, (0, 0, 0), None)
-        textRect = text.get_rect()
-        textRect.x = 20
-        textRect.y = 20
-        if inverted == True:
-            other_text = font.render("You found an easter egg! Inverted mode", True, (0, 0, 0), None)
-            other_textRect = other_text.get_rect()
-            other_textRect.x = width//2
-            other_textRect.y = 20
-            scrn.blit(other_text, other_textRect)
+
+        handle_input()
         player.gravity()
         scrn.fill(background_color)
-        scrn.blit(text, textRect)
+        draw_text()
         scrn.blit(player.invert, player.rect)
         if player.rect.y > height or player.rect.y < 0:
             running = False
