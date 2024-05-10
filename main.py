@@ -91,7 +91,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             sub_rect.y = 175
             
             # Render stats text
-            last = sub_font.render(f"Last Score: {last_score}, Time survived: {time_taken} (seconds)", True, (255, 0, 0))
+            last = sub_font.render(f"Last Score: {last_score}, Time survived: {time_taken}s", True, (255, 0, 0))
             last_rect = last.get_rect()
             last_rect.x = (width/2)-300
             last_rect.y = 200
@@ -130,7 +130,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
                     play_sound_played = True
                 play_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
-                    return main()
+                    return main(inverted=False)
                     running = False
             else:
                 play_color = (255, 255, 255)
@@ -140,7 +140,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             if easter_egg:
                 color = (200, 200, 200)
                 if event.type == pygame.MOUSEBUTTONUP:
-                    return main_inverted()
+                    return main(inverted=True)
                     running = False
             else:
                 color = (255, 255, 255)
@@ -273,9 +273,8 @@ def options_menu(toggled):
                 running = False
         pygame.display.flip()
                 
-        
 
-def main():
+def main(inverted):
     width = 1200
     height = 720
     
@@ -290,6 +289,7 @@ def main():
 
     score = 0
     enemy_velocity = 5
+    background_color = (0, 0, 0) if inverted == False else (255, 255, 255)
     
     class Player(pygame.sprite.Sprite):
         def __init__(self):
@@ -297,139 +297,13 @@ def main():
             self.image = pygame.image.load("player.png")
             self.image_size = (70, 50)
             self.flappy = pygame.transform.scale(self.image, self.image_size)
-            self.rect = self.flappy.get_rect() 
-            self.rect.x = 100 
-            self.rect.y = 100 
-            self.velocity = 0
-            self.gravity_force = 0.5
-            self.jump_force = -7
-            self.terminal_velocity = 50
-    
-        def gravity(self):
-            self.velocity += self.gravity_force
-            self.rect.y += self.velocity
-            if self.velocity > self.terminal_velocity:
-                self.velocity = self.terminal_velocity
-    
-        def jump(self):
-            self.velocity = self.jump_force
-        
-    
-    class Enemy(pygame.sprite.Sprite):
-        def __init__(self, color, x):
-            self.x = x
-            self.width = 50
-            self.gap = 300
-            self.height_bottom = random.randint(100, height - self.gap)
-            self.y_bottom = height - self.height_bottom
-            self.height_top = height - self.gap - self.height_bottom
-            self.y_top = 0
-            self.color = color
-            self.rect_bottom = pygame.Rect(self.x, self.y_bottom, self.width, self.height_bottom)
-            self.rect_top = pygame.Rect(self.x, self.y_top, self.width, self.height_top)
-            self.velocity = enemy_velocity
-            self.score_counted = False
-    
-        def move(self):
-            self.x -= self.velocity
-            self.rect_bottom.x = self.x
-            self.rect_top.x = self.x
-    
-        def draw(self):
-            pygame.draw.rect(scrn, self.color, self.rect_bottom)
-            pygame.draw.rect(scrn, self.color, self.rect_top)
-            
-        def accel(self):
-            if self.x < 0 and not self.score_counted:
-                global score
-                score += 1
-                global enemy_velocity
-                enemy_velocity += 0.01
-                self.score_counted = True
-    
-    
-    
-    font = pygame.font.SysFont(None, 32)
-    
-    player = Player()
-    enemies = []
-    spawn_timer = 0
-    spawn_delay = 120
-    clock = pygame.time.Clock()
-
-    start = time.time()
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-    
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            player.jump()
-    
-        text = font.render(f'Score: {score}', True, (255, 255, 255), None)
-        textRect = text.get_rect()
-        textRect.x = 20
-        textRect.y = 20
-        player.gravity()
-        scrn.fill((0,0,0))
-        scrn.blit(text, textRect)
-        scrn.blit(player.flappy, player.rect)
-        if player.rect.y > height or player.rect.y < 0:
-            running = False
-            return main_menu(score, time.time()-start, 1, True)
-    
-        for enemy in enemies:
-            enemy.move()
-            enemy.draw()
-            enemy.accel()
-            enemy.velocity = enemy_velocity
-            collide = pygame.Rect.colliderect(player.rect, enemy.rect_bottom) or pygame.Rect.colliderect(player.rect, enemy.rect_top)
-            if collide:
-                return main_menu(score, time.time()-start, 1, True)
-                running = False
-    
-        spawn_timer += 1
-        if spawn_timer >= spawn_delay:
-            x = width
-            enemies.append(Enemy((255, 0, 0), x))
-            spawn_timer = 0
-    
-        enemies = [enemy for enemy in enemies if enemy.x > -enemy.width]
-    
-    
-        pygame.display.flip()
-        clock.tick(60)
-
-def main_inverted():
-    width = 1200
-    height = 720
-    
-    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
-    
-    pygame.display.set_caption("Flappy Bird")
-    
-    running = True
-
-    global score
-    global enemy_velocity
-
-    score = 0
-    enemy_velocity = 5
-    
-    class Player(pygame.sprite.Sprite):
-        def __init__(self):
-            super().__init__()
-            self.image = pygame.image.load("player.png")
-            self.image_size = (70, 50)
-            self.flappy = pygame.transform.scale(self.image, self.image_size)
-            self.invert = pygame.transform.flip(self.flappy, False, True)
+            self.invert = pygame.transform.flip(self.flappy, False, True) if inverted == True else pygame.transform.flip(self.flappy, False, False)
             self.rect = self.invert.get_rect() 
             self.rect.x = 100
-            self.rect.y = height-100
+            self.rect.y = height-100 if inverted == True else 100
             self.velocity = 0
-            self.gravity_force = -0.5
-            self.jump_force = 7
+            self.gravity_force = -0.5 if inverted == True else 0.5
+            self.jump_force = 7 if inverted == True else -7
             self.terminal_velocity = 50
     
         def gravity(self):
@@ -473,8 +347,6 @@ def main_inverted():
                 global enemy_velocity
                 enemy_velocity += 0.01
                 self.score_counted = True
-    
-    
     
     font = pygame.font.SysFont(None, 32)
     
@@ -499,14 +371,15 @@ def main_inverted():
         textRect = text.get_rect()
         textRect.x = 20
         textRect.y = 20
-        other_text = font.render("You found an easter egg! Inverted mode", True, (0, 0, 0), None)
-        other_textRect = other_text.get_rect()
-        other_textRect.x = width//2
-        other_textRect.y = 20
+        if inverted == True:
+            other_text = font.render("You found an easter egg! Inverted mode", True, (0, 0, 0), None)
+            other_textRect = other_text.get_rect()
+            other_textRect.x = width//2
+            other_textRect.y = 20
+            scrn.blit(other_text, other_textRect)
         player.gravity()
-        scrn.fill((255, 255, 255))
+        scrn.fill(background_color)
         scrn.blit(text, textRect)
-        scrn.blit(other_text, other_textRect)
         scrn.blit(player.invert, player.rect)
         if player.rect.y > height or player.rect.y < 0:
             running = False
@@ -525,7 +398,7 @@ def main_inverted():
         spawn_timer += 1
         if spawn_timer >= spawn_delay:
             x = width
-            enemies.append(Enemy((0, 0, 255), x))
+            enemies.append(Enemy((0, 0, 255) if inverted == True else (255, 0, 0), x))
             spawn_timer = 0
     
         enemies = [enemy for enemy in enemies if enemy.x > -enemy.width]
