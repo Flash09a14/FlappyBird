@@ -39,7 +39,7 @@ class SFX():
         self.sound = None
 
 
-play_sfx = SFX("SFX\select.wav")
+play_sfx = SFX("SFX\\select.wav")
 
 def main_menu(last_score, time_taken, sfx_volume, audio_state):
     pygame.mixer.music.set_volume(sfx_volume)
