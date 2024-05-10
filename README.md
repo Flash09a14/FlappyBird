@@ -6,7 +6,16 @@ This project may be used for reference or as open-source
 
 ## Quick Start
 
-Run the following commands in the root directory
+#### Windows
+Run the following commands for Windows systems in the root directory or run the .bat file included in the repository
+```bat
+python3 -m venv .venv
+.venv\Scripts\activate
+pip3 install -r requirements.txt
+```
+
+#### UNIX
+Run the following commands for UNIX systems in the root directory or run the .sh file included in the repository
 
 ```shell
 python3 -m venv .venv
