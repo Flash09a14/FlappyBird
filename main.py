@@ -299,14 +299,14 @@ def main(inverted):
     def draw_text():
         text_color = (255, 255, 255) if inverted == False else (0, 0, 0)
         text = font.render(f'Score: {score}', True, text_color, None)
-        textRect = text.get_rect()
-        textRect.x = 20
-        textRect.y = 20
+        text_rect = text.get_rect()
+        text_rect.x = 20
+        text_rect.y = 20
         other_text = font.render("You found an easter egg! Inverted mode", True, (0, 0, 0), None)
         other_textRect = other_text.get_rect()
         other_textRect.x = 20
         other_textRect.y = 50
-        scrn.blit(text, textRect)
+        scrn.blit(text, text_rect)
         if inverted == True:
             scrn.blit(other_text, other_textRect)
     
