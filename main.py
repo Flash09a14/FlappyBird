@@ -41,9 +41,17 @@ class SFX():
 
 
 if name == "nt":
-    play_sfx = SFX("SFX\\select.wav")
+    select_sfx = SFX("SFX\\select.wav")
+    jump_sfx = SFX("SFX\\jump.wav")
+    jump_two_sfx = SFX("SFX\\jump_two.wav")
+    jump_three_sfx = SFX("SFX\\jump_three.wav")
 else:
-    play_sfx = SFX("SFX//select.wav")
+    select_sfx = SFX("SFX//select.wav")
+    jump_sfx = SFX("SFX//jump.wav")
+    jump_two_sfx = SFX("SFX//jump_two.wav")
+    jump_three_sfx = SFX("SFX//jump_three.wav")
+
+jump_list = [jump_sfx, jump_two_sfx, jump_three_sfx]
 
 def main_menu(last_score, time_taken, sfx_volume, audio_state):
     pygame.mixer.music.set_volume(sfx_volume)
@@ -77,7 +85,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
     source_sound_played = False
     options_sound_played = False
 
-    play_sfx.set_volume(sfx_volume)
+    select_sfx.set_volume(sfx_volume)
 
     while running:
         for event in pygame.event.get():
@@ -118,12 +126,11 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
 
             if hover:
                 if not play_sound_played:
-                    play_sfx.sfx()
+                    select_sfx.sfx()
                     play_sound_played = True
                 play_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
-                    return main(inverted=False)
-                    running = False
+                    return main(inverted=False, volume=sfx_volume)
             else:
                 play_color = (255, 255, 255)
                 play_sound_played = False
@@ -131,14 +138,13 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             if easter_egg:
                 color = (200, 200, 200)
                 if event.type == pygame.MOUSEBUTTONUP:
-                    return main(inverted=True)
-                    running = False
+                    return main(inverted=True, volume=sfx_volume)
             else:
                 color = (255, 255, 255)
 
             if quit_hover:
                 if not quit_sound_played:
-                    play_sfx.sfx()
+                    select_sfx.sfx()
                     quit_sound_played = True
                 quit_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -149,7 +155,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
 
             if source_hover:
                 if not source_sound_played:
-                    play_sfx.sfx()
+                    select_sfx.sfx()
                     source_sound_played = True
                 source_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -160,7 +166,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
 
             if options_hover:
                 if not options_sound_played:
-                    play_sfx.sfx()
+                    select_sfx.sfx()
                     options_sound_played = True
                 options_color = (0, 255, 0)
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -186,7 +192,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
         scrn.blit(flappy, image_rect)
         pygame.display.flip()
 
-    play_sfx.unload_sfx()
+    select_sfx.unload_sfx()
 
 def options_menu(toggled):
     width = 1000
@@ -226,7 +232,7 @@ def options_menu(toggled):
 
             if audio_hover:
                 if not audio_sound_played:
-                    play_sfx.sfx()
+                    select_sfx.sfx()
                     audio_sound_played = True
                 if event.type == pygame.MOUSEBUTTONDOWN and toggled == False:
                     audio_color = (0, 255, 0)
@@ -242,7 +248,7 @@ def options_menu(toggled):
             if back_hover:
                 back_color = (0, 255, 0)
                 if not back_sound_played:
-                    play_sfx.sfx()
+                    select_sfx.sfx()
                     back_sound_played = True
                 if event.type == pygame.MOUSEBUTTONUP:
                     return main_menu(0, 0, global_volume, toggled)
@@ -258,7 +264,8 @@ def options_menu(toggled):
         pygame.display.flip()
                 
 
-def main(inverted):
+def main(inverted, volume):
+    pygame.mixer.music.set_volume(volume)
     width = 1200
     height = 720
     
@@ -276,9 +283,15 @@ def main(inverted):
     background_color = (0, 0, 0) if inverted == False else (255, 255, 255)
 
     def handle_input():
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            player.jump()
+        space_pressed = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and not space_pressed:
+                player.play_jump = False
+                player.jump()
+                space_pressed = True
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_SPACE:
+                space_pressed = False
 
     def draw_text():
         text_color = (255, 255, 255) if inverted == False else (0, 0, 0)
@@ -308,6 +321,7 @@ def main(inverted):
             self.gravity_force = -0.5 if inverted == True else 0.5
             self.jump_force = 7 if inverted == True else -7
             self.terminal_velocity = 50
+            self.play_jump = False
     
         def gravity(self):
             self.velocity += self.gravity_force
@@ -317,6 +331,11 @@ def main(inverted):
     
         def jump(self):
             self.velocity = self.jump_force
+            if not self.play_jump:
+                jump_sound = random.choice(jump_list)
+                jump_sound.sfx()
+                print(jump_sound.name)
+                self.play_jump = True
         
     
     class Enemy(pygame.sprite.Sprite):
@@ -365,15 +384,15 @@ def main(inverted):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            handle_input()
 
-        handle_input()
         player.gravity()
         scrn.fill(background_color)
         draw_text()
         scrn.blit(player.invert, player.rect)
         if player.rect.y > height or player.rect.y < 0:
             running = False
-            return main_menu(score, time.time()-start, 1, True)
+            return main_menu(score, time.time()-start, volume, True if volume > 0 else False)
     
         for enemy in enemies:
             enemy.move()
@@ -383,7 +402,6 @@ def main(inverted):
             collide = pygame.Rect.colliderect(player.rect, enemy.rect_bottom) or pygame.Rect.colliderect(player.rect, enemy.rect_top)
             if collide:
                 return main_menu(score, time.time()-start, 1, True)
-                running = False
     
         spawn_timer += 1
         if spawn_timer >= spawn_delay:
