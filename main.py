@@ -367,7 +367,7 @@ def main(inverted, volume):
                 global score
                 score += 1
                 global enemy_velocity
-                enemy_velocity += 0.01
+                enemy_velocity += 0.1
                 self.score_counted = True
     
     font = pygame.font.SysFont(None, 32)
@@ -377,7 +377,7 @@ def main(inverted, volume):
         i.set_volume(volume)
     enemies = []
     spawn_timer = 0
-    spawn_delay = 120
+    spawn_delay = 100
     clock = pygame.time.Clock()
 
     start = time.time()
