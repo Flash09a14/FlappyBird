@@ -332,9 +332,9 @@ def main(inverted, volume):
         def jump(self):
             self.velocity = self.jump_force
             if not self.play_jump:
-                jump_sound = random.choice(jump_list)
-                jump_sound.sfx()
-                print(jump_sound.name)
+                self.jump_sound = random.choice(jump_list)
+                self.jump_sound.sfx()
+                print(self.jump_sound.name)
                 self.play_jump = True
         
     
@@ -373,12 +373,23 @@ def main(inverted, volume):
     font = pygame.font.SysFont(None, 32)
     
     player = Player()
+    for i in jump_list:
+        i.set_volume(volume)
     enemies = []
     spawn_timer = 0
     spawn_delay = 120
     clock = pygame.time.Clock()
 
     start = time.time()
+    countdown_seconds = 3
+    while time.time() - start < countdown_seconds:
+        remaining_time = countdown_seconds - int(time.time() - start)
+        countdown_text = font.render(f'Game starting in {remaining_time} seconds', True, (255, 255, 255))
+        countdown_rect = countdown_text.get_rect(center=(width // 2, height // 2))
+        scrn.fill(background_color)
+        scrn.blit(countdown_text, countdown_rect)
+        pygame.display.flip()
+        clock.tick(1)
     
     while running:
         for event in pygame.event.get():
@@ -401,7 +412,7 @@ def main(inverted, volume):
             enemy.velocity = enemy_velocity
             collide = pygame.Rect.colliderect(player.rect, enemy.rect_bottom) or pygame.Rect.colliderect(player.rect, enemy.rect_top)
             if collide:
-                return main_menu(score, time.time()-start, 1, True)
+                return main_menu(score, time.time()-start, volume, True if volume > 0 else False)
     
         spawn_timer += 1
         if spawn_timer >= spawn_delay:
