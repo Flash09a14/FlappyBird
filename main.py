@@ -384,7 +384,7 @@ def main(inverted, volume):
     countdown_seconds = 3
     while time.time() - start < countdown_seconds:
         remaining_time = countdown_seconds - int(time.time() - start)
-        countdown_text = font.render(f'Game starting in {remaining_time} seconds', True, (255, 255, 255))
+        countdown_text = font.render(f'Game starting in {remaining_time} seconds', True, (255, 255, 255) if inverted == False else (0, 0, 0))
         countdown_rect = countdown_text.get_rect(center=(width // 2, height // 2))
         scrn.fill(background_color)
         scrn.blit(countdown_text, countdown_rect)
