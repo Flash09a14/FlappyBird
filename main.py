@@ -93,7 +93,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
             logo.make("Flappy Bird")
 
             # Render sub-text
-            sub = sub_font.render("Made by Aram 9C (This took me way too long I wanna die)", True, (255, 255, 255))
+            sub = sub_font.render("This took me way too long", True, (255, 255, 255))
             sub_rect = sub.get_rect()
             sub_rect.x = (width/2)-300
             sub_rect.y = 175
