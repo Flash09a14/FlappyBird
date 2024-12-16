@@ -58,7 +58,7 @@ def main_menu(last_score, time_taken, sfx_volume, audio_state):
     width = 1000
     height = 800
     
-    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
+    scrn = pygame.display.set_mode((width, height))
     
     pygame.display.set_caption("Flappy Bird")
 
@@ -198,7 +198,7 @@ def options_menu(toggled):
     width = 1000
     height = 500
 
-    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
+    scrn = pygame.display.set_mode((width, height))
 
     running = True
 
@@ -269,7 +269,7 @@ def main(inverted, volume):
     width = 1200
     height = 720
     
-    scrn = pygame.display.set_mode((width, height), flags=pygame.SCALED, vsync=1)
+    scrn = pygame.display.set_mode((width, height))
     
     pygame.display.set_caption("Flappy Bird")
     
@@ -389,7 +389,7 @@ def main(inverted, volume):
         scrn.fill(background_color)
         scrn.blit(countdown_text, countdown_rect)
         pygame.display.flip()
-        clock.tick(1)
+        clock.tick(60)
     
     while running:
         for event in pygame.event.get():
