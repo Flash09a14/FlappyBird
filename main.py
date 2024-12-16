@@ -389,7 +389,7 @@ def main(inverted, volume):
         scrn.fill(background_color)
         scrn.blit(countdown_text, countdown_rect)
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(1)
     
     while running:
         for event in pygame.event.get():
